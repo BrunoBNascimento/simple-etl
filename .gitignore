@@ -1,0 +1,30 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build output directories
+/dist/
+/packages/*/dist/
+
+# Ignore NestJS specific directories
+/packages/*/node_modules/
+/packages/*/coverage/
+/packages/*/logs/
+/packages/*/tmp/
+
+# Ignore package lock files
+/packages/*/package-lock.json
+/package-lock.json
+
+# Ignore environment files
+/packages/*/env/
+.env
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+
+# Ignore logs and temporary files
+logs/
+tmp/
+
+# Ignore any other files or directories specific to your project
