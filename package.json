@@ -5,7 +5,9 @@
     "packages/*"
   ],
   "dependencies": {
+    "@nestjs/axios": "^3.0.2",
     "@nestjs/microservices": "^10.3.9",
+    "axios": "^1.7.2",
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {

@@ -13,8 +13,10 @@ export class FileStrategy implements BaseStrategy {
     @Inject('PRODUCER_SERVICE') private readonly producer: ClientKafka,
   ) {}
 
-  private fileStream: fs.ReadStream;
-  private middleStream = new PassThrough({ objectMode: true });
+  private productsStream: fs.ReadStream;
+  private stockStream: fs.ReadStream;
+  private middleProductsStream = new PassThrough({ objectMode: true });
+  private middleStockStream = new PassThrough({ objectMode: true });
   private tenant: string;
 
   private setTenant(tenant: string) {
@@ -22,23 +24,35 @@ export class FileStrategy implements BaseStrategy {
   }
 
   fetch() {
-    const fileName = path.join(process.cwd(), 'src', 'files', 'produtos.csv');
+    const products = path.join(process.cwd(), 'src', 'files', 'produtos.csv');
+    const stock = path.join(process.cwd(), 'src', 'files', 'estoque.csv');
 
-    this.fileStream = fs.createReadStream(fileName);
+    this.productsStream = fs.createReadStream(products);
+    this.stockStream = fs.createReadStream(stock);
 
     return this;
   }
 
   process() {
-    this.fileStream.pipe(csv({ separator: ';' })).pipe(this.middleStream);
+    this.productsStream
+      .pipe(csv({ separator: ';' }))
+      .pipe(this.middleProductsStream);
+
+    this.stockStream.pipe(csv({ separator: ';' })).pipe(this.middleStockStream);
     return this;
   }
 
   send() {
-    this.middleStream.on('data', async (data) => {
+    this.middleProductsStream.on('data', async (data) => {
       const message = createKafkaTopicObject(data, 'files', this.tenant);
 
       await this.producer.emit('produtos_raw', message);
+    });
+
+    this.middleStockStream.on('data', async (data) => {
+      const message = createKafkaTopicObject(data, 'files', this.tenant);
+
+      await this.producer.emit('estoque_raw', message);
     });
   }
 
